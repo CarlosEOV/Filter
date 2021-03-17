@@ -222,3 +222,24 @@ def blur(image, intensity=0):
         return convolution(image, blur_matrix_1, blur_width_1, blur_height_1, factor_1, bias_1)
     else:
         return convolution(image, blur_matrix_2, blur_width_2, blur_height_2, factor_2, bias_2)
+
+def motion_blur(image):
+    motion_blur_matrix = [
+        [1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1]
+    ]
+
+    motion_blur_w = 9
+    motion_blur_h = 9
+    factor = 1.0 / 9.0
+    bias = 0.0
+
+    return convolution(image, motion_blur_matrix, motion_blur_w, motion_blur_h, factor, bias)
+
