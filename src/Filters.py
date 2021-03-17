@@ -136,8 +136,8 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size):
                 pixel = pixels[i, j]
                 pixels[i, j] = (average[0], average[1], average[2], 255)
     
-def clamp(x, minimum, maximum):
-    return max(minimum, min(x, maximum))
+def clamp(x, minimum, maximum, factor=1, bias=0):
+    return max(minimum, min(factor * x + bias, maximum))
 
 def high_contrast(image, inverted=False):
     pixels = image.load()
@@ -163,6 +163,62 @@ def RGB_components(image, r, g, b):
     
     return update_img(image)
 
+def convolution(image, filter_matrix, filter_width, filter_height, factor, bias):
+    img_copy = image.copy()
+    pixels = img_copy.load()
+    og_pixels = image.load()
+    w = image.size[0]
+    h = image.size[1]
+    for i in range(w):
+        for j in range(h):
+            red = 0
+            green = 0
+            blue = 0
+            imageX = 0
+            imageY = 0
+            for m in range(filter_height):
+                for n in range(filter_width):
+                    imageX = (i - filter_width / 2 + n + w) % w
+                    imageY = (j - filter_height / 2 + m + h) % h
+                    pixel = pixels[imageX , imageY]
+                    red += pixel[0] * filter_matrix[m][n]
+                    green += pixel[1] * filter_matrix[m][n]
+                    blue += pixel[2] * filter_matrix[m][n]
+            
+            og_pixels[i, j] = (int(clamp(red, 0, 255, factor, bias)), 
+                            int(clamp(green, 0, 255, factor, bias)), 
+                            int(clamp(blue, 0, 255, factor, bias)), 
+                            255)
 
+    return update_img(image)
 
+def blur(image, intensity=0):
+    
+    blur_matrix_1 = [
+        [0.0, 0.2, 0.0],
+        [0.2, 0.2, 0.2],
+        [0.0, 0.2, 0.0]
+    ]
 
+    blur_width_1 = 3
+    blur_height_1 = 3
+    factor_1 = 1.0
+    bias_1 = 0.0
+
+    blur_matrix_2 = [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+    ]
+
+    blur_width_2 = 5
+    blur_height_2 = 5
+    factor_2 = 1.0 / 13.0
+    bias_2 = 0.0
+
+    if intensity == 0:
+        return convolution(image, blur_matrix_1, blur_width_1, blur_height_1, factor_1, bias_1)
+    else:
+        return convolution(image, blur_matrix_2, blur_width_2, blur_height_2, factor_2, bias_2)

@@ -26,7 +26,11 @@ def start_filter_GUI():
                                                 'Max and Min Grayscale', 'Max Grayscale', 'Min Grayscale', '---',  
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
-                             '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components']],
+                             '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components', 
+                             '&Convolution', ['&Blur'
+
+                                             ]
+                             ]],
                 
                 ['&Help', '&About...'], ]
     
@@ -340,6 +344,31 @@ def start_filter_GUI():
                     F_IMG = OG_IMG.copy()
                     progress_bar.update_bar(1)
                     RGB_components(F_IMG, int(red), int(green), int(blue))
+                    progress_bar.update_bar(6)
+                    T_IMG = F_IMG.copy()
+                    T_IMG.thumbnail(size=IMG_SIZE)
+                    progress_bar.update_bar(8)
+                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
+                    progress_bar.update_bar(9)
+                    pb_window.close()
+            
+            elif event == 'Blur':
+                b_event, b_values = sg.Window('Blur', [
+                    [sg.T('Select intensity matrix for blur filter')],
+                    [sg.Radio(text='3x3 Matrix', group_id=1, default=True, key='-3_M-'), 
+                     sg.Radio(text='5x5 Matrix', group_id=1, default=False, key='-5_M-')
+                    ],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                selection = 0 if b_values['-3_M-'] else 1
+                
+                if selection != None:
+                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
+                    progress_bar = pb_window['-PGRB-']
+                    F_IMG = OG_IMG.copy()
+                    progress_bar.update_bar(1)
+                    blur(F_IMG, selection)
                     progress_bar.update_bar(6)
                     T_IMG = F_IMG.copy()
                     T_IMG.thumbnail(size=IMG_SIZE)
