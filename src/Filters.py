@@ -258,3 +258,17 @@ def find_edges(image):
     bias = 0.0
 
     return convolution(image, find_edges_matrix, find_edges_w, find_edges_h, factor, bias)
+
+def sharpen(image):
+    sharpen_matrix = [
+        [-1, -1, -1],
+        [-1, 9, -1],
+        [-1, -1, -1]
+    ]
+
+    sharpen_w = 3 
+    sharpen_h = 3
+    factor = 1.0
+    bias = 0.0
+
+    return convolution(image, sharpen_matrix, sharpen_w, sharpen_h, factor, bias)
