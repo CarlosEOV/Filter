@@ -272,3 +272,19 @@ def sharpen(image):
     bias = 0.0
 
     return convolution(image, sharpen_matrix, sharpen_w, sharpen_h, factor, bias)
+
+def emboss(image):
+    emboss_matrix = [
+        [-1, -1, -1, -1, 0],
+        [-1, -1, -1, 0, 1],
+        [-1, -1, 0, 1, 1],
+        [-1, 0, 1, 1, 1],
+        [0, 1, 1, 1, 1]
+    ]
+
+    emboss_w = 5
+    emboss_h = 5
+    factor = 1.0
+    bias = 128.0
+
+    return convolution(image, emboss_matrix, emboss_w, emboss_h, factor, bias)
