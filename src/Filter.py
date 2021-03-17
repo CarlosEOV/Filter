@@ -26,7 +26,7 @@ def start_filter_GUI():
                                                 'Max and Min Grayscale', 'Max Grayscale', 'Min Grayscale', '---',  
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
-                             '&Brightness', '&Mosaic', '&High contrast', '&Inverted']],
+                             '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components']],
                 
                 ['&Help', '&About...'], ]
     
@@ -313,6 +313,40 @@ def start_filter_GUI():
                 main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
                 progress_bar.update_bar(9)
                 pb_window.close()
+
+            elif event == 'RGB components':
+                b_event, b_values = sg.Window('RGB components', [
+                    [sg.T('Adjust RGB components')],
+                    [sg.T('Red')],
+                    [sg.Slider(range=(0, 255), default_value=0, resolution=1, tick_interval=40, 
+                                orientation='h', border_width=3, size=(40, 10), key='-R_VALUE-', tooltip='Red')],
+                    [sg.T('Green')],
+                    [sg.Slider(range=(0, 255), default_value=0, resolution=1, tick_interval=40, 
+                                orientation='h', border_width=3, size=(40, 10), key='-G_VALUE-', tooltip='Green')],
+                    [sg.T('Blue')],
+                    [sg.Slider(range=(0, 255), default_value=0, resolution=1, tick_interval=40, 
+                                orientation='h', border_width=3, size=(40, 10), key='-B_VALUE-', tooltip='Blue')],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+                
+                red = b_values['-R_VALUE-']
+                green = b_values['-G_VALUE-']
+                blue = b_values['-B_VALUE-']
+                
+                if red != None and green != None and blue != None:
+                
+                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
+                    progress_bar = pb_window['-PGRB-']
+                    F_IMG = OG_IMG.copy()
+                    progress_bar.update_bar(1)
+                    RGB_components(F_IMG, int(red), int(green), int(blue))
+                    progress_bar.update_bar(6)
+                    T_IMG = F_IMG.copy()
+                    T_IMG.thumbnail(size=IMG_SIZE)
+                    progress_bar.update_bar(8)
+                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
+                    progress_bar.update_bar(9)
+                    pb_window.close()
 
         if event == 'About...':
             #main_window.disappear()

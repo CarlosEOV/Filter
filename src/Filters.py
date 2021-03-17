@@ -154,5 +154,15 @@ def high_contrast(image, inverted=False):
             pixels[i, j] = (color, color, color, 255)
     return update_img(image)
 
+def RGB_components(image, r, g, b):
+    pixels = image.load()
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            pixel = pixels[i, j]
+            pixels[i, j] = (r and pixel[0], g and pixel[1], b and pixel[0], 255)
+    
+    return update_img(image)
+
+
 
 
