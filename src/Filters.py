@@ -138,3 +138,17 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size):
     
 def clamp(x, minimum, maximum):
     return max(minimum, min(x, maximum))
+
+def high_contrast(image):
+    pixels = image.load()
+    wite = 255
+    black = 0
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            pixel = pixels[i, j]
+            gray = int((pixel[0] * 0.3) + (pixel[1] * 0.59) + (pixel[2] * 0.11))
+            color = wite if gray > 127 else black
+            pixels[i, j] = (color, color, color, 255)
+    return update_img(image)
+
+

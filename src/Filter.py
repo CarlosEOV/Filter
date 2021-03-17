@@ -26,7 +26,7 @@ def start_filter_GUI():
                                                 'Max and Min Grayscale', 'Max Grayscale', 'Min Grayscale', '---',  
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
-                             '&Brightness', '&Mosaic']],
+                             '&Brightness', '&Mosaic', '&High contrast']],
                 
                 ['&Help', '&About...'], ]
     
@@ -285,6 +285,20 @@ def start_filter_GUI():
                     main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
                     progress_bar.update_bar(9)
                     pb_window.close()
+
+            elif event == 'High contrast':
+                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
+                progress_bar = pb_window['-PGRB-']
+                F_IMG = OG_IMG.copy()
+                progress_bar.update_bar(1)
+                high_contrast(F_IMG)
+                progress_bar.update_bar(6)
+                T_IMG = F_IMG.copy()
+                T_IMG.thumbnail(size=IMG_SIZE)
+                progress_bar.update_bar(8)
+                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
+                progress_bar.update_bar(9)
+                pb_window.close()
 
         if event == 'About...':
             #main_window.disappear()
