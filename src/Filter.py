@@ -27,7 +27,7 @@ def start_filter_GUI():
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
                              '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components', 
-                             '&Convolution', ['&Blur', '&Motion blur', 
+                             '&Convolution', ['&Blur', '&Motion blur', '&Find edges'
 
                                              ]
                              ]],
@@ -383,6 +383,20 @@ def start_filter_GUI():
                 F_IMG = OG_IMG.copy()
                 progress_bar.update_bar(1)
                 motion_blur(F_IMG)
+                progress_bar.update_bar(6)
+                T_IMG = F_IMG.copy()
+                T_IMG.thumbnail(size=IMG_SIZE)
+                progress_bar.update_bar(8)
+                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
+                progress_bar.update_bar(9)
+                pb_window.close()
+            
+            elif event == 'Find edges':
+                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
+                progress_bar = pb_window['-PGRB-']
+                F_IMG = OG_IMG.copy()
+                progress_bar.update_bar(1)
+                find_edges(F_IMG)
                 progress_bar.update_bar(6)
                 T_IMG = F_IMG.copy()
                 T_IMG.thumbnail(size=IMG_SIZE)

@@ -243,3 +243,18 @@ def motion_blur(image):
 
     return convolution(image, motion_blur_matrix, motion_blur_w, motion_blur_h, factor, bias)
 
+def find_edges(image):
+    find_edges_matrix = [
+        [-1,  0,  0,  0,  0],
+        [0, -2,  0,  0,  0],
+        [0,  0,  6,  0,  0],
+        [0,  0,  0, -2,  0],
+        [0,  0,  0,  0, -1]
+    ]
+
+    find_edges_w = 5
+    find_edges_h = 5
+    factor = 1.0
+    bias = 0.0
+
+    return convolution(image, find_edges_matrix, find_edges_w, find_edges_h, factor, bias)
