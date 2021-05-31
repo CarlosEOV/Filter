@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 import io
 import os
 from PIL import Image, ImageGrab
+from PySimpleGUI.PySimpleGUI import main
 from Decoder_IMG import *
 from Filters import *
 
@@ -14,11 +15,12 @@ BG_COLOR = '#2f363d'
 MAIN_COLOR = '#1a1d21'
 SEC_COLOR = '#353942'
 TXT_COLOR = '#d5d8e0'
+OG_IMG = None
+F_IMG = None
 sg.theme('DarkBlue2')
 
 def start_filter_GUI():
-    OG_IMG = None
-    F_IMG = None
+    
 
     menu_toolbar = [['&File', ['&Open', '&Save', '&Exit']],
                 
@@ -97,149 +99,47 @@ def start_filter_GUI():
             pb_layout = [[sg.Text('Loading...')],
                          [sg.ProgressBar(max_value=10, orientation='h', size=(45, 15), key='-PGRB-')]
                         ]
-            
             if event == 'Average Grayscale':
-                pb_window = sg.Window(title='Loading filter', layout=pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                average_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()                
+                apply_filter(event, F_IMG, main_window)
 
             elif event == 'Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
 
             elif event == 'Luma Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                luma_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Max and Min Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                max_min_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
-            
+                apply_filter(event, F_IMG,  main_window)
+
             elif event == 'Max Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                max_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Min Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                min_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
-            
+                apply_filter(event, F_IMG, main_window)
+
             elif event == 'Red Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                red_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Green Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                green_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
 
             elif event == 'Blue Grayscale':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                blue_grayscale(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
 
             elif event == 'Shades of Gray':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                shades_of_grayscale(F_IMG, 8)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
-            
+                apply_filter(event, F_IMG, main_window)
+
             elif event == 'Brightness':
-                
                 b_event, b_values = sg.Window('Brightness', [
                     [sg.T('Adjust brightness')],
                     [sg.Slider(range=(-180, 180), default_value=0, resolution=1, tick_interval=100, 
@@ -248,21 +148,10 @@ def start_filter_GUI():
                 ], modal=True, keep_on_top=True).read(close=True)
                 brightness_value = b_values['-BRGHT-']
                 if brightness_value != None:
-                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                    progress_bar = pb_window['-PGRB-']
                     F_IMG = OG_IMG.copy()
-                    progress_bar.update_bar(1)
-                    brightness(F_IMG, int(brightness_value))
-                    progress_bar.update_bar(6)
-                    T_IMG = F_IMG.copy()
-                    T_IMG.thumbnail(size=IMG_SIZE)
-                    progress_bar.update_bar(8)
-                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                    progress_bar.update_bar(9)
-                    pb_window.close()
+                    apply_filter(event, F_IMG, main_window, int(brightness_value))                    
 
             elif event == 'Mosaic':
-                
                 b_event, b_values = sg.Window('Mosaic', [
                     [sg.T('Adjust mosaic size')],
                     [sg.T('Height')],
@@ -277,46 +166,16 @@ def start_filter_GUI():
                 h_value = b_values['-H_VALUE-']
 
                 if w_value != None and h_value != None:
-                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                    progress_bar = pb_window['-PGRB-']
                     F_IMG = OG_IMG.copy()
-                    progress_bar.update_bar(1)
-                    mosaic(F_IMG, int(w_value), int(h_value))
-                    progress_bar.update_bar(6)
-                    T_IMG = F_IMG.copy()
-                    T_IMG.thumbnail(size=IMG_SIZE)
-                    progress_bar.update_bar(8)
-                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                    progress_bar.update_bar(9)
-                    pb_window.close()
-
+                    apply_filter(event, F_IMG, main_window, int(w_value), int(h_value))
+                    
             elif event == 'High contrast':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                high_contrast(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Inverted':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                high_contrast(F_IMG, True)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
 
             elif event == 'RGB components':
                 b_event, b_values = sg.Window('RGB components', [
@@ -338,20 +197,9 @@ def start_filter_GUI():
                 blue = b_values['-B_VALUE-']
                 
                 if red != None and green != None and blue != None:
-                
-                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                    progress_bar = pb_window['-PGRB-']
                     F_IMG = OG_IMG.copy()
-                    progress_bar.update_bar(1)
-                    RGB_components(F_IMG, int(red), int(green), int(blue))
-                    progress_bar.update_bar(6)
-                    T_IMG = F_IMG.copy()
-                    T_IMG.thumbnail(size=IMG_SIZE)
-                    progress_bar.update_bar(8)
-                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                    progress_bar.update_bar(9)
-                    pb_window.close()
-            
+                    apply_filter(event, F_IMG, main_window, int(red), int(green), int(blue))
+                    
             elif event == 'Blur':
                 b_event, b_values = sg.Window('Blur', [
                     [sg.T('Select intensity matrix for blur filter')],
@@ -364,78 +212,28 @@ def start_filter_GUI():
                 selection = 0 if b_values['-3_M-'] else 1
                 
                 if selection != None:
-                    pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                    progress_bar = pb_window['-PGRB-']
                     F_IMG = OG_IMG.copy()
-                    progress_bar.update_bar(1)
-                    blur(F_IMG, selection)
-                    progress_bar.update_bar(6)
-                    T_IMG = F_IMG.copy()
-                    T_IMG.thumbnail(size=IMG_SIZE)
-                    progress_bar.update_bar(8)
-                    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                    progress_bar.update_bar(9)
-                    pb_window.close()
+                    apply_filter(event, F_IMG, main_window, selection)
             
             elif event == 'Motion blur':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                motion_blur(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
-            
+                apply_filter(event, F_IMG, main_window)
+                
             elif event == 'Find edges':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                find_edges(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Sharpen':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                sharpen(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
             
             elif event == 'Emboss':
-                pb_window = sg.Window('Loading filter', pb_layout, finalize=True, disable_close=True, modal=True)
-                progress_bar = pb_window['-PGRB-']
                 F_IMG = OG_IMG.copy()
-                progress_bar.update_bar(1)
-                emboss(F_IMG)
-                progress_bar.update_bar(6)
-                T_IMG = F_IMG.copy()
-                T_IMG.thumbnail(size=IMG_SIZE)
-                progress_bar.update_bar(8)
-                main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
-                progress_bar.update_bar(9)
-                pb_window.close()
+                apply_filter(event, F_IMG, main_window)
 
         if event == 'About...':
             #main_window.disappear()
-            sg.popup('Filter App', 'Version 1.01', 'Carlos Eduardo Orozco Viveros', 'Release date: 03/12/21',
+            sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
             #main_window.reappear()
@@ -468,5 +266,63 @@ def ask_for_filename(default_filename='', initial_folder=None, size=None):
         elif event == "OK":
             save_window.close()
             return values['-FILETOSAVE-']
+
+def apply_filter(filter_name, F_IMG, main_window, param_1=0, param_2=0, param_3=0):
+    pb_layout = [[sg.Text('Loading...')],
+                         [sg.ProgressBar(max_value=10, orientation='h', size=(45, 15), key='-PGRB-')]
+                        ]
+    pb_window = sg.Window(title='Loading filter', layout=pb_layout, finalize=True, disable_close=True, modal=True)
+    progress_bar = pb_window['-PGRB-']
+    progress_bar.update_bar(1)
+    choose_filter(filter_name, F_IMG, param_1, param_2, param_3)
+    progress_bar.update_bar(6)
+    T_IMG = F_IMG.copy()
+    T_IMG.thumbnail(size=IMG_SIZE)
+    progress_bar.update_bar(8)
+    main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
+    progress_bar.update_bar(9)
+    pb_window.close()   
+
+def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
+    if filter_name == 'Average Grayscale':
+        average_grayscale(F_IMG)
+    if filter_name == 'Grayscale':
+        grayscale(F_IMG)
+    if filter_name == 'Luma Grayscale':
+        luma_grayscale(F_IMG)
+    if filter_name == 'Max and Min Grayscale':
+        max_min_grayscale(F_IMG)
+    if filter_name == 'Max Grayscale':
+        max_grayscale(F_IMG)
+    if filter_name == 'Min Grayscale':
+        min_grayscale(F_IMG)
+    if filter_name == 'Red Grayscale':
+        red_grayscale(F_IMG)
+    if filter_name == 'Green Grayscale':
+        green_grayscale(F_IMG)
+    if filter_name == 'Blue Grayscale':
+        blue_grayscale(F_IMG)
+    if filter_name == 'Shades of Gray':
+        shades_of_grayscale(F_IMG, 8)
+    if filter_name == 'Brightness':
+        brightness(F_IMG, param_1)
+    if filter_name == 'Mosaic':
+        mosaic(F_IMG, param_1, param_2)
+    if filter_name == 'High contrast':
+        high_contrast(F_IMG)
+    if filter_name == 'Inverted':
+        high_contrast(F_IMG, True)
+    if filter_name == 'RGB components':
+        RGB_components(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Blur':
+        blur(F_IMG, param_1)
+    if filter_name == 'Motion blur':
+        motion_blur(F_IMG)
+    if filter_name == 'Find edges':
+        find_edges(F_IMG)
+    if filter_name == 'Sharpen':
+        sharpen(F_IMG)
+    if filter_name == 'Emboss':    
+        emboss(F_IMG)
 
 start_filter_GUI()
