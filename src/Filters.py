@@ -108,7 +108,10 @@ def mosaic(image, w, h, method_id=0):
     
     d = ImageDraw.Draw(image)
     fnt = ImageFont.truetype("/System/Library/Fonts/arial.ttf", h)
-    
+    lasvb = ImageFont.truetype("fonts/Lasvbld.ttf", h) 
+    lasvw = ImageFont.truetype("fonts/Lasvwd.ttf", h)
+    plcrds = ImageFont.truetype("fonts/PLAYCRDS.TTF", h+5)
+
     for i in range(0, size[0], w):
         for j in range(0, size[1], h):    
             if method_id == 0: 
@@ -163,6 +166,84 @@ def mosaic(image, w, h, method_id=0):
                     d.text((i,j), ".", font=fnt, fill=fill_color)
                 if  240 <= gray <= 255:
                     d.text((i,j), " ", font=fnt, fill=fill_color)
+            
+            if method_id == 6:
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                gray = int((average[0] + average[1] + average[2]) / 3)
+                
+                if  0 <= gray <= 25:
+                    d.text((i,j), "0", font=lasvb, fill=(0,0,0,255))
+                if  26 <= gray <= 50:
+                    d.text((i,j), "1", font=lasvb, fill=(0,0,0,255))
+                if  51 <= gray <= 75:
+                    d.text((i,j), "2", font=lasvb, fill=(0,0,0,255))
+                if  76 <= gray <= 100:
+                    d.text((i,j), "3", font=lasvb, fill=(0,0,0,255))
+                if  101 <= gray <= 125:
+                    d.text((i,j), "4", font=lasvb, fill=(0,0,0,255))
+                if  126 <= gray <= 150:
+                    d.text((i,j), "5", font=lasvb, fill=(0,0,0,255))
+                if  151 <= gray <= 175:
+                    d.text((i,j), "6", font=lasvb, fill=(0,0,0,255))
+                if  176 <= gray <= 200:
+                    d.text((i,j), "7", font=lasvb, fill=(0,0,0,255))
+                if  201 <= gray <= 225:
+                    d.text((i,j), "8", font=lasvb, fill=(0,0,0,255))
+                if  226 <= gray <= 255:
+                    d.text((i,j), "9", font=lasvb, fill=(0,0,0,255))
+            
+            if method_id == 7:
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                gray = int((average[0] + average[1] + average[2]) / 3)
+                
+                if  0 <= gray <= 25:
+                    d.text((i,j), "9", font=lasvw, fill=(0,0,0,255))
+                if  26 <= gray <= 50:
+                    d.text((i,j), "8", font=lasvw, fill=(0,0,0,255))
+                if  51 <= gray <= 75:
+                    d.text((i,j), "7", font=lasvw, fill=(0,0,0,255))
+                if  76 <= gray <= 100:
+                    d.text((i,j), "6", font=lasvw, fill=(0,0,0,255))
+                if  101 <= gray <= 125:
+                    d.text((i,j), "5", font=lasvw, fill=(0,0,0,255))
+                if  126 <= gray <= 150:
+                    d.text((i,j), "4", font=lasvw, fill=(0,0,0,255))
+                if  151 <= gray <= 175:
+                    d.text((i,j), "3", font=lasvw, fill=(0,0,0,255))
+                if  176 <= gray <= 200:
+                    d.text((i,j), "2", font=lasvw, fill=(0,0,0,255))
+                if  201 <= gray <= 225:
+                    d.text((i,j), "1", font=lasvw, fill=(0,0,0,255))
+                if  226 <= gray <= 255:
+                    d.text((i,j), "0", font=lasvw, fill=(0,0,0,255))
+            
+            if method_id == 8:
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                gray = int((average[0] + average[1] + average[2]) / 3)
+                
+                if  0 <= gray <= 23:
+                    d.text((i,j), "k", font=plcrds, fill=(0,0,0,255))
+                if  24 <= gray <= 46:
+                    d.text((i,j), "j", font=plcrds, fill=(0,0,0,255))
+                if  47 <= gray <= 69:
+                    d.text((i,j), "i", font=plcrds, fill=(0,0,0,255))
+                if  70 <= gray <= 92:
+                    d.text((i,j), "h", font=plcrds, fill=(0,0,0,255))
+                if  93 <= gray <= 115:
+                    d.text((i,j), "g", font=plcrds, fill=(0,0,0,255))
+                if  116 <= gray <= 138:
+                    d.text((i,j), "f", font=plcrds, fill=(0,0,0,255))
+                if  139 <= gray <= 161:
+                    d.text((i,j), "e", font=plcrds, fill=(0,0,0,255))
+                if  162 <= gray <= 184:
+                    d.text((i,j), "d", font=plcrds, fill=(0,0,0,255))
+                if  185 <= gray <= 207:
+                    d.text((i,j), "c", font=plcrds, fill=(0,0,0,255))
+                if  208 <= gray <= 230:
+                    d.text((i,j), "b", font=plcrds, fill=(0,0,0,255))
+                if  231 <= gray <= 255:
+                    d.text((i,j), "a", font=plcrds, fill=(0,0,0,255))
+
     return update_img(image)
 
 def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False):

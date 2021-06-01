@@ -15,12 +15,12 @@ BG_COLOR = '#2f363d'
 MAIN_COLOR = '#1a1d21'
 SEC_COLOR = '#353942'
 TXT_COLOR = '#d5d8e0'
-OG_IMG = None
-F_IMG = None
+
 sg.theme('DarkBlue2')
 
 def start_filter_GUI():
-    
+    OG_IMG = None
+    F_IMG = None
 
     menu_toolbar = [['&File', ['&Open', '&Save', '&Exit']],
                 
@@ -30,7 +30,8 @@ def start_filter_GUI():
                                                 'Shades of Gray'],
                              '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components', 
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
-                             '&Text', ['&Color Ms', '&Grayscale Ms', '&Color characters', '&Black and White characters', '&Grayscale characters'],
+                             '&Text', ['&Color Ms', '&Grayscale Ms', '&Color characters', '&Black and White characters', 
+                             '&Grayscale characters', '&Black dominoes', '&White dominoes', '&Cards'],
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -249,13 +250,23 @@ def start_filter_GUI():
             elif event == 'Grayscale characters':
                 F_IMG = OG_IMG.copy()
                 apply_filter(event, F_IMG, main_window)
+                
+            elif event == 'Black dominoes':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'White dominoes':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Cards':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
 
         if event == 'About...':
-            #main_window.disappear()
             sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
-            #main_window.reappear()
 
     main_window.close()
 
@@ -353,5 +364,11 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         mosaic(F_IMG, 5, 5, 4)
     if filter_name == 'Grayscale characters':
         mosaic(F_IMG, 5, 5, 5)
+    if filter_name == 'Black dominoes':
+        mosaic(F_IMG, 10, 10, 6)
+    if filter_name == 'White dominoes':
+        mosaic(F_IMG, 10, 10, 7)
+    if filter_name == 'Cards':
+        mosaic(F_IMG, 10, 10, 8)
 
 start_filter_GUI()
