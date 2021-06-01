@@ -30,8 +30,8 @@ def start_filter_GUI():
                                                 'Shades of Gray'],
                              '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components', 
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
-                             '&Text', ['&Color Ms', '&Grayscale Ms', '&Color characters', '&Black and White characters', 
-                             '&Grayscale characters', '&Black dominoes', '&White dominoes', '&Cards'],
+                             '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
+                             '&Grayscale characters', '---', '&Sign', '---', '&Black dominoes', '&White dominoes','---', '&Cards'],
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -250,6 +250,19 @@ def start_filter_GUI():
             elif event == 'Grayscale characters':
                 F_IMG = OG_IMG.copy()
                 apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Sign':
+                s_event, s_values = sg.Window('Sign', layout=[
+                    [sg.T('Type a message for sign filter (20 characters maximum)')],
+                    [sg.Input(default_text='This is my message', size=(80, 10), tooltip='Type something!', do_not_clear=False, key='-SIGN_TXT-')],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                message = s_values['-SIGN_TXT-']
+
+                if message != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, message)
                 
             elif event == 'Black dominoes':
                 F_IMG = OG_IMG.copy()
@@ -364,6 +377,8 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         mosaic(F_IMG, 5, 5, 4)
     if filter_name == 'Grayscale characters':
         mosaic(F_IMG, 5, 5, 5)
+    if filter_name == 'Sign':
+        mosaic(F_IMG, 10, 10, 9, param_1.upper())
     if filter_name == 'Black dominoes':
         mosaic(F_IMG, 10, 10, 6)
     if filter_name == 'White dominoes':

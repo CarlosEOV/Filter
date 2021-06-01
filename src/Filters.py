@@ -102,24 +102,33 @@ def brightness(image, brightness=0):
             pixels[i, j] = (clamp(pixel[0] + brightness, 0 , 255), clamp(pixel[1] + brightness, 0 , 255), clamp(pixel[2] + brightness, 0 , 255), 255)
     return update_img(image)
 
-def mosaic(image, w, h, method_id=0):
+def mosaic(image, w, h, method_id=0, sign='CARLOS'):
     pixels = image.load()
     size = (image.size[0], image.size[1])
-    
+    sign_len = len(sign)
+    if sign_len > 20:
+        sign = sign[:20]
+        sign_len = 20
+    sign_idx = 0
     d = ImageDraw.Draw(image)
     fnt = ImageFont.truetype("/System/Library/Fonts/arial.ttf", h)
     lasvb = ImageFont.truetype("fonts/Lasvbld.ttf", h) 
     lasvw = ImageFont.truetype("fonts/Lasvwd.ttf", h)
     plcrds = ImageFont.truetype("fonts/PLAYCRDS.TTF", h+5)
 
-    for i in range(0, size[0], w):
-        for j in range(0, size[1], h):    
+    for j in range(0, size[1], h):
+        for i in range(0, size[0], w):    
             if method_id == 0: 
                 average_grid(pixels, i, j, w, h, size)
 
-            if method_id == 1:
+            if method_id == 1 or method_id == 9:
                 average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
-                d.text((i,j), "M", font=fnt, fill=(average[0], average[1], average[2], 255))
+                if method_id == 9:
+                    d.text((i,j), sign[sign_idx], font=fnt, fill=(average[0], average[1], average[2], 255))
+                    sign_idx = ( sign_idx + 1 ) % sign_len
+                else:
+                    d.text((i,j), "M", font=fnt, fill=(average[0], average[1], average[2], 255))
+
 
             if method_id == 2:
                 average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
