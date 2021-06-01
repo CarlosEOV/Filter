@@ -31,6 +31,6 @@ def update_img(img):
         img.save(bio, format="PNG")
         img_data = bio.getvalue()
         return img_data
-    
+
 def get_bytes(img):
     return update_img(img)

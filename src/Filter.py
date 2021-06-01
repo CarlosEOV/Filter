@@ -29,9 +29,8 @@ def start_filter_GUI():
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
                              '&Brightness', '&Mosaic', '&High contrast', '&Inverted', '&RGB components', 
-                             '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'
-
-                                             ]
+                             '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
+                             '&Text', ['&Color Ms', '&Grayscale Ms', '&Color characters', '&Black and White characters', '&Grayscale characters'],
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -231,6 +230,26 @@ def start_filter_GUI():
                 F_IMG = OG_IMG.copy()
                 apply_filter(event, F_IMG, main_window)
 
+            elif event == 'Color Ms':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Grayscale Ms':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Black and White characters':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Color characters':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Grayscale characters':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+
         if event == 'About...':
             #main_window.disappear()
             sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
@@ -324,5 +343,15 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         sharpen(F_IMG)
     if filter_name == 'Emboss':    
         emboss(F_IMG)
+    if filter_name == 'Color Ms':
+        mosaic(F_IMG, 5, 5, 1)
+    if filter_name == 'Grayscale Ms':
+        mosaic(F_IMG, 5, 5, 2)
+    if filter_name == 'Black and White characters':
+        mosaic(F_IMG, 5, 5, 3)
+    if filter_name == 'Color characters':
+        mosaic(F_IMG, 5, 5, 4)
+    if filter_name == 'Grayscale characters':
+        mosaic(F_IMG, 5, 5, 5)
 
 start_filter_GUI()

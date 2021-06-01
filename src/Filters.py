@@ -1,4 +1,5 @@
 from Decoder_IMG import update_img
+from PIL import Image, ImageFont, ImageDraw
 
 def average_grayscale(image):
     pixels = image.load()
@@ -101,17 +102,70 @@ def brightness(image, brightness=0):
             pixels[i, j] = (clamp(pixel[0] + brightness, 0 , 255), clamp(pixel[1] + brightness, 0 , 255), clamp(pixel[2] + brightness, 0 , 255), 255)
     return update_img(image)
 
-def mosaic(image, w, h):
+def mosaic(image, w, h, method_id=0):
     pixels = image.load()
     size = (image.size[0], image.size[1])
-
-    for i in range(0, size[0], w):
-        for j in range(0, size[1], h):
-            average_grid(pixels, i, j, w, h, size)
     
+    d = ImageDraw.Draw(image)
+    fnt = ImageFont.truetype("/System/Library/Fonts/arial.ttf", h)
+    
+    for i in range(0, size[0], w):
+        for j in range(0, size[1], h):    
+            if method_id == 0: 
+                average_grid(pixels, i, j, w, h, size)
+
+            if method_id == 1:
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                d.text((i,j), "M", font=fnt, fill=(average[0], average[1], average[2], 255))
+
+            if method_id == 2:
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                gray = int((average[0] + average[1] + average[2]) / 3)
+                d.text((i,j), "M", font=fnt, fill=(gray, gray, gray, 255))
+            
+            if method_id == 3 or method_id == 4 or method_id == 5:
+                fill_color = (0,0,0,255)
+                average = average_grid(pixels, i, j, w, h, size, is_for_txt=True)
+                gray = int((average[0] + average[1] + average[2]) / 3)
+                if method_id == 4:
+                    fill_color = (average[0], average[1], average[2], 255)
+                if method_id == 5:
+                    fill_color = (gray, gray, gray, 255)
+                if  0 <= gray <= 15:
+                    d.text((i,j), "M", font=fnt, fill=fill_color)
+                if  16 <= gray <= 31:
+                    d.text((i,j), "N", font=fnt, fill=fill_color)
+                if  32 <= gray <= 47:
+                    d.text((i,j), "H", font=fnt, fill=fill_color)
+                if  48 <= gray <= 63:
+                    d.text((i,j), "#", font=fnt, fill=fill_color)
+                if  64 <= gray <= 79:
+                    d.text((i,j), "Q", font=fnt, fill=fill_color)
+                if  80 <= gray <= 95:
+                    d.text((i,j), "U", font=fnt, fill=fill_color)
+                if  96 <= gray <= 111:
+                    d.text((i,j), "A", font=fnt, fill=fill_color)
+                if  112 <= gray <= 127:
+                    d.text((i,j), "D", font=fnt, fill=fill_color)
+                if  128 <= gray <= 143:
+                    d.text((i,j), "O", font=fnt, fill=fill_color)
+                if  144 <= gray <= 159:
+                    d.text((i,j), "Y", font=fnt, fill=fill_color)
+                if  160 <= gray <= 175:
+                    d.text((i,j), "2", font=fnt, fill=fill_color)
+                if  176 <= gray <= 191:
+                    d.text((i,j), "$", font=fnt, fill=fill_color)
+                if  192 <= gray <= 209:
+                    d.text((i,j), "%", font=fnt, fill=fill_color)
+                if  210 <= gray <= 225:
+                    d.text((i,j), "+", font=fnt, fill=fill_color)
+                if  226 <= gray <= 239:
+                    d.text((i,j), ".", font=fnt, fill=fill_color)
+                if  240 <= gray <= 255:
+                    d.text((i,j), " ", font=fnt, fill=fill_color)
     return update_img(image)
 
-def average_grid(pixels, origin_x, origin_y, x, y, img_size):
+def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False):
     w = origin_x + x
     h = origin_y + y
     if w > img_size[0]: w = img_size[0]
@@ -135,7 +189,10 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size):
             for j in range(origin_y, h):
                 pixel = pixels[i, j]
                 pixels[i, j] = (average[0], average[1], average[2], 255)
-    
+                if is_for_txt:
+                    pixels[i, j] = (255, 255, 255, 255)
+    return average
+
 def clamp(x, minimum, maximum, factor=1, bias=0):
     return max(minimum, min(factor * x + bias, maximum))
 
@@ -160,7 +217,6 @@ def RGB_components(image, r, g, b):
         for j in range(image.size[1]):
             pixel = pixels[i, j]
             pixels[i, j] = (r and pixel[0], g and pixel[1], b and pixel[0], 255)
-    
     return update_img(image)
 
 def convolution(image, filter_matrix, filter_width, filter_height, factor, bias):
