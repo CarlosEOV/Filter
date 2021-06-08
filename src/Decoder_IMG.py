@@ -2,6 +2,8 @@ import PIL.Image
 import io
 import base64
 
+from PySimpleGUI.PySimpleGUI import Debug
+
 def convert_to_bytes(file_or_bytes, resize=None):
     
     if isinstance(file_or_bytes, str) and file_or_bytes != "":
@@ -11,6 +13,7 @@ def convert_to_bytes(file_or_bytes, resize=None):
         try:
             img = PIL.Image.open(io.BytesIO(base64.b64decode(file_or_bytes)))
         except PIL.UnidentifiedImageError:
+            Debug('Error al intentar abrir la imagen')
             return (None, None)
         except Exception:
             dataBytesIO = io.BytesIO(file_or_bytes)

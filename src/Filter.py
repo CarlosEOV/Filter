@@ -2,8 +2,7 @@
 import PySimpleGUI as sg
 import io
 import os
-from PIL import Image, ImageGrab
-from PySimpleGUI.PySimpleGUI import main
+from PIL import ImageGrab
 from Decoder_IMG import *
 from Filters import *
 
@@ -32,6 +31,7 @@ def start_filter_GUI():
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
                              '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
                              '&Grayscale characters', '---', '&Sign', '---', '&Black dominoes', '&White dominoes','---', '&Cards'],
+                             '&Blending' , '&Watermark',
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -275,6 +275,91 @@ def start_filter_GUI():
             elif event == 'Cards':
                 F_IMG = OG_IMG.copy()
                 apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Blending':
+                filename = sg.popup_get_file('Image to blend', no_window=True, keep_on_top=True, modal=True, file_types=(("PNG, JPG", "*.png *.jpg"),))
+                img_to_blend, img_bytes = convert_to_bytes(filename)
+                if img_to_blend != None and img_bytes != None:
+                    b_event, b_values = sg.Window('Blending', [
+                        [sg.T('Adjust blending')],
+                        [sg.Column([[sg.Frame(title='Image to blend', 
+                                            layout=[[sg.Image(size=(230, 230), pad=(0, 5), 
+                                                    key='-OG_IM-',
+                                                    data=get_bytes(img_to_blend), 
+                                                    background_color=BG_COLOR)]], 
+                                            background_color=BG_COLOR, 
+                                            size=(240, 240), 
+                                            key='-OGF_IM-', 
+                                            relief=sg.RELIEF_RAISED)]], 
+                                    size=(250, 250), 
+                                    background_color= MAIN_COLOR, ),
+                        sg.VerticalSeparator(), 
+                        sg.Column([[sg.Frame(title='Original image', 
+                                            layout=[[sg.Image(size=(230, 230), pad=(0, 5), 
+                                                    key='-BD_IM-',
+                                                    data=get_bytes(F_IMG), 
+                                                    background_color=BG_COLOR)]], 
+                                            background_color=BG_COLOR, 
+                                            size=(240, 240), 
+                                            key='-BDF_IM-', 
+                                            relief=sg.RELIEF_RAISED)]], 
+                                    size=(250, 250), 
+                                    background_color= MAIN_COLOR, ),
+                        ],
+                        [sg.Slider(range=(0, 100), default_value=50, resolution=1, tick_interval=20, 
+                                    orientation='h', border_width=3, size=(40, 10), key='-BLDN-', tooltip='Blending')],
+                        [sg.Button('Ok')]
+                    ], element_justification='center', modal=True, keep_on_top=True).read(close=True)
+                    blending_value = b_values['-BLDN-']
+                    if blending_value != None:
+                        F_IMG = OG_IMG.copy()
+                        apply_filter(event, F_IMG, main_window, img_to_blend, blending_value * 0.01)
+                
+            elif event == 'Watermark':
+                w_layout = [[sg.T('Set your watermark')],
+                            [sg.HorizontalSeparator()],
+                            
+                            [sg.T('Position')],
+                            [sg.T('Horizontal'),
+                             sg.Radio(text='Left', group_id=1, default=True, key='-L_H-'),
+                             sg.Radio(text='Center', group_id=1, default=False, key='-C_H-'), 
+                             sg.Radio(text='Right', group_id=1, default=False, key='-R_H-'),
+                             sg.VerticalSeparator(),
+                             sg.T('Vertical'),
+                             sg.Radio(text='Top', group_id=2, default=True, key='-T_V-'), 
+                             sg.Radio(text='Center', group_id=2, default=False, key='-C_V-'),
+                             sg.Radio(text='Bottom', group_id=2, default=False, key='-B_V-')],
+                             
+                            [sg.T('Text (60 characters maximum)')],
+                            [sg.Input(default_text='This is my watermark', size=(80, 10), tooltip='Type something!', 
+                                      do_not_clear=False, key='-WM_TXT-')],
+                            [sg.T('Alpha')],
+                            [sg.Slider(range=(0, 100), default_value=50, resolution=1, tick_interval=20, 
+                                       orientation='h', border_width=3, size=(40, 10), key='-ALPHA-', tooltip='Alpha')],
+
+                            [sg.Button('Ok')]
+                ]
+                w_event, w_values = sg.Window(title='Watermark', layout=w_layout, element_justification='center', 
+                                              modal=True, keep_on_top=True).read(close=True)
+                text = w_values['-WM_TXT-']
+                w_h = 2
+                if w_values['-L_H-']:
+                    w_h = 0
+                elif w_values['-C_H-']:
+                    w_h = 1
+                w_v = 2
+                if w_values['-T_V-']:
+                    w_v = 0
+                elif w_values['-C_V-']:
+                    w_v = 1
+                position = (w_h, w_v)
+                alpha = w_values['-ALPHA-']
+                
+                if text != None and alpha != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, text, position, alpha * 0.01)
+
+                
 
         if event == 'About...':
             sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
@@ -385,5 +470,9 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         mosaic(F_IMG, 10, 10, 7)
     if filter_name == 'Cards':
         mosaic(F_IMG, 10, 10, 8)
+    if filter_name == 'Blending':
+        blend(F_IMG, param_1, param_2)
+    if filter_name == 'Watermark':
+        watermark(F_IMG, param_1, param_2, param_3)
 
 start_filter_GUI()

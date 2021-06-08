@@ -102,6 +102,51 @@ def brightness(image, brightness=0):
             pixels[i, j] = (clamp(pixel[0] + brightness, 0 , 255), clamp(pixel[1] + brightness, 0 , 255), clamp(pixel[2] + brightness, 0 , 255), 255)
     return update_img(image)
 
+def blend(image, image2, alpha):
+    pixels = image.load()
+    pixels_2 = image2.load()
+
+    w1 = image.size[0]
+    w2 = image2.size[0]
+    h1 = image.size[1]
+    h2 = image2.size[1]
+
+    w = w1 if w1 < w2 else w2
+    h = h1 if h1 < h2 else h2
+    
+    for i in range(w):
+        for j in range(h):
+            pixel = pixels[i, j]
+            pixel2 = pixels_2[i, j]
+            if pixel2[3] != 0:
+                pixels[i, j] = (int((pixel[0] * alpha) + (pixel2[0] * (1.0 - alpha))), int((pixel[1] * alpha) + (pixel2[1] * (1.0 - alpha))), int((pixel[2] * alpha) + (pixel2[2] * (1.0 - alpha))), 255)
+    return update_img(image)
+
+def watermark(image, watermark, position, alpha):
+    og_size = (image.size[0], image.size[1])
+    watermark_img = Image.new('RGBA', og_size, (255,255,255,0))
+    d = ImageDraw.Draw(watermark_img)
+    fnt_size = int(og_size[1] * 0.1)
+    fnt = ImageFont.truetype("/System/Library/Fonts/arial.ttf", fnt_size)
+    if len(watermark) > 60:
+        watermark = watermark[:60]
+
+    h = int(og_size[0] * 0.33)
+    if position[0] == 0:
+        h = int(og_size[0] * 0.05)
+    elif position[0] == 2:
+        h = int(og_size[0] * 0.66)
+    
+    v = int(og_size[1] * 0.33)
+    if position[1] == 0:
+        v = int(og_size[1] * 0.05)
+    elif position[1] == 2:
+        v = int(og_size[1] * 0.66)         
+    
+    d.text((h,v), watermark, font=fnt, fill=(0, 0, 0, 255))
+
+    return blend(image, watermark_img, alpha)
+
 def mosaic(image, w, h, method_id=0, sign='CARLOS'):
     pixels = image.load()
     size = (image.size[0], image.size[1])
