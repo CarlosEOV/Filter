@@ -1,3 +1,4 @@
+from PySimpleGUI.PySimpleGUI import Sizer
 from Decoder_IMG import update_img
 from PIL import Image, ImageFont, ImageDraw
 
@@ -146,6 +147,31 @@ def watermark(image, watermark, position, alpha):
     d.text((h,v), watermark, font=fnt, fill=(0, 0, 0, 255))
 
     return blend(image, watermark_img, alpha)
+
+def mosaic_img_bw(image, img_grid, w, h):
+    num_shades = 32
+    shades = create_shades(img_grid, (w, h), num_shades, True)
+    pixels = image.load()
+
+    for j in range(0, image.size[1], h):
+        for i in range(0, image.size[0], w):
+            average_grid(pixels, i, j, w, h, (image.size[0], image.size[1]), False, True, shades)
+    
+    return update_img(image)
+
+def create_shades(image, size, num_shades, bnw=False):
+    shades = []
+    image = image.resize(size=size)
+    
+    if bnw:
+        grayscale(image)
+    jump = int(256 / num_shades)
+    for bright in range(-127, 127, jump):
+        new_img = image.copy()
+        brightness(new_img, bright)
+        shades.append(new_img)
+
+    return shades
 
 def mosaic(image, w, h, method_id=0, sign='CARLOS'):
     pixels = image.load()
@@ -300,7 +326,7 @@ def mosaic(image, w, h, method_id=0, sign='CARLOS'):
 
     return update_img(image)
 
-def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False):
+def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, rep_img=False, shades=None):
     w = origin_x + x
     h = origin_y + y
     if w > img_size[0]: w = img_size[0]
@@ -319,13 +345,38 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False):
     if total != 0:
         for idx in range(3):
             average[idx] = int(average[idx] / total)
+        
+        if rep_img:
+            
+            gray = int((average[0] + average[1] + average[2]) / 3)
+            shade_idx = 0
+            shade = None
 
-        for i in range(origin_x, w):
-            for j in range(origin_y, h):
-                pixel = pixels[i, j]
-                pixels[i, j] = (average[0], average[1], average[2], 255)
-                if is_for_txt:
-                    pixels[i, j] = (255, 255, 255, 255)
+            for idx in range(0, 256, 8):
+                if idx <= gray <= (idx + 7):
+                    shade = shades[shade_idx].copy()
+                    break
+                shade_idx += 1
+            
+            pixels_sh = shade.load()
+            
+            ri_x = -1        
+            for i in range(origin_x, w):
+                ri_x += 1
+                ri_y = -1
+                for j in range(origin_y, h):
+                    ri_y += 1
+                    if ri_y <= shade.size[1] - 1 and ri_x <= shade.size[0] - 1:
+                        pixel_sh = pixels_sh[ri_x, ri_y]
+                        pixels[i, j] = (pixel_sh[0], pixel_sh[1], pixel_sh[2], 255)
+                    
+        else:
+            for i in range(origin_x, w):
+                for j in range(origin_y, h):
+                    pixel = pixels[i, j]
+                    pixels[i, j] = (average[0], average[1], average[2], 255)
+                    if is_for_txt:
+                        pixels[i, j] = (255, 255, 255, 255)
     return average
 
 def clamp(x, minimum, maximum, factor=1, bias=0):
