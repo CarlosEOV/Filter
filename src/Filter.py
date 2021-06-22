@@ -28,7 +28,7 @@ def start_filter_GUI():
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
                              '&Brightness', 
-                             '&Mosaics', ['&Mosaic', '&Image mosaic BnW', '&Image mosaic true colors'], 
+                             '&Mosaics', ['&Mosaic', '&Image BnW', '&Image true colors'], 
                              '&High contrast', '&Inverted', '&RGB components', 
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
                              '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
@@ -361,7 +361,7 @@ def start_filter_GUI():
                     F_IMG = OG_IMG.copy()
                     apply_filter(event, F_IMG, main_window, text, position, alpha * 0.01)
             
-            elif event =='Image mosaic BnW':
+            elif event =='Image BnW':
                 filename = sg.popup_get_file('Image for grid', no_window=True, keep_on_top=True, modal=True, file_types=(("PNG, JPG", "*.png *.jpg"),))
                 img_for_grid, img_bytes = convert_to_bytes(filename)
                 if img_for_grid != None and img_bytes != None:
@@ -406,11 +406,11 @@ def start_filter_GUI():
                         F_IMG = OG_IMG.copy()
                         apply_filter(event, F_IMG, main_window, img_for_grid, int(w_value), int(h_value))
             
-            elif event == 'Image mosaic true colors':
+            elif event == 'Image true colors':
                 filename = sg.popup_get_file('Image for grid', no_window=True, keep_on_top=True, modal=True, file_types=(("PNG, JPG", "*.png *.jpg"),))
                 img_for_grid, img_bytes = convert_to_bytes(filename)
                 if img_for_grid != None and img_bytes != None:
-                    b_event, b_values = sg.Window('Mosaic', [
+                    b_event, b_values = sg.Window('Mosaic true colors', [
                         [sg.Column([[sg.Frame(title='Image for grid', 
                                             layout=[[sg.Image(size=(230, 230), pad=(0, 5), 
                                                     key='-OG_IM-',
@@ -452,7 +452,7 @@ def start_filter_GUI():
                         apply_filter(event, F_IMG, main_window, img_for_grid, int(w_value), int(h_value))
 
         if event == 'About...':
-            sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
+            sg.popup('Filter App', 'Version 1.05', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/22/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
 
@@ -564,9 +564,9 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         blend(F_IMG, param_1, param_2)
     if filter_name == 'Watermark':
         watermark(F_IMG, param_1, param_2, param_3)
-    if filter_name == 'Image mosaic BnW':
+    if filter_name == 'Image BnW':
         mosaic_img_bw(F_IMG, param_1, param_2, param_3)
-    if filter_name == 'Image mosaic true colors':
+    if filter_name == 'Image true colors':
         mosaic_true_colors(F_IMG, param_1, param_2, param_3)
 
 start_filter_GUI()
