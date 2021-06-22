@@ -27,7 +27,8 @@ def start_filter_GUI():
                                                 'Max and Min Grayscale', 'Max Grayscale', 'Min Grayscale', '---',  
                                                 'Red Grayscale', 'Green Grayscale', 'Blue Grayscale', '---', 
                                                 'Shades of Gray'],
-                             '&Brightness', '&Mosaics', ['&Mosaic', '&Image mosaic BnW'], 
+                             '&Brightness', 
+                             '&Mosaics', ['&Mosaic', '&Image mosaic BnW', '&Image mosaic true colors'], 
                              '&High contrast', '&Inverted', '&RGB components', 
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
                              '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
@@ -404,7 +405,51 @@ def start_filter_GUI():
                     if w_value != None and h_value != None:
                         F_IMG = OG_IMG.copy()
                         apply_filter(event, F_IMG, main_window, img_for_grid, int(w_value), int(h_value))
-                
+            
+            elif event == 'Image mosaic true colors':
+                filename = sg.popup_get_file('Image for grid', no_window=True, keep_on_top=True, modal=True, file_types=(("PNG, JPG", "*.png *.jpg"),))
+                img_for_grid, img_bytes = convert_to_bytes(filename)
+                if img_for_grid != None and img_bytes != None:
+                    b_event, b_values = sg.Window('Mosaic', [
+                        [sg.Column([[sg.Frame(title='Image for grid', 
+                                            layout=[[sg.Image(size=(230, 230), pad=(0, 5), 
+                                                    key='-OG_IM-',
+                                                    data=get_bytes(img_for_grid.copy().resize((230,230))), 
+                                                    background_color=BG_COLOR)]], 
+                                            background_color=BG_COLOR, 
+                                            size=(240, 240), 
+                                            key='-OGF_IM-', 
+                                            relief=sg.RELIEF_RAISED)]], 
+                                    size=(250, 250), 
+                                    background_color= MAIN_COLOR, ),
+                        sg.VerticalSeparator(), 
+                        sg.Column([[sg.Frame(title='Base image', 
+                                            layout=[[sg.Image(size=(230, 230), pad=(0, 5), 
+                                                    key='-BD_IM-',
+                                                    data=get_bytes(OG_IMG.copy().resize((230,230))), 
+                                                    background_color=BG_COLOR)]], 
+                                            background_color=BG_COLOR, 
+                                            size=(240, 240), 
+                                            key='-BDF_IM-', 
+                                            relief=sg.RELIEF_RAISED)]], 
+                                    size=(250, 250), 
+                                    background_color= MAIN_COLOR, ),
+                        ],
+                        [sg.T('Adjust mosaic size')],
+                        [sg.T('Height')],
+                        [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                    orientation='h', border_width=3, size=(40, 10), key='-H_VALUE-', tooltip='Height')],
+                        [sg.T('Width')],
+                        [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                    orientation='h', border_width=3, size=(40, 10), key='-W_VALUE-', tooltip='Width')],
+                        [sg.Button('Ok')]
+                    ], modal=True, keep_on_top=True).read(close=True)
+                    w_value = b_values['-W_VALUE-']
+                    h_value = b_values['-H_VALUE-']
+
+                    if w_value != None and h_value != None:
+                        F_IMG = OG_IMG.copy()
+                        apply_filter(event, F_IMG, main_window, img_for_grid, int(w_value), int(h_value))
 
         if event == 'About...':
             sg.popup('Filter App', 'Version 1.03', 'Carlos Eduardo Orozco Viveros', 'Release date: 05/31/21',
@@ -521,5 +566,7 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         watermark(F_IMG, param_1, param_2, param_3)
     if filter_name == 'Image mosaic BnW':
         mosaic_img_bw(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Image mosaic true colors':
+        mosaic_true_colors(F_IMG, param_1, param_2, param_3)
 
 start_filter_GUI()

@@ -155,16 +155,24 @@ def mosaic_img_bw(image, img_grid, w, h):
 
     for j in range(0, image.size[1], h):
         for i in range(0, image.size[0], w):
-            average_grid(pixels, i, j, w, h, (image.size[0], image.size[1]), False, True, shades)
+            average_grid(pixels, i, j, w, h, (image.size[0], image.size[1]), False, True, False, shades)
     
     return update_img(image)
 
-def create_shades(image, size, num_shades, bnw=False):
+def mosaic_true_colors(image, img_grid, w, h):
+    pixels = image.load()
+    img_grid = img_grid.resize(size=(w, h))
+    for j in range(0, image.size[1], h):
+        for i in range(0, image.size[0], w):
+            average_grid(pixels, i, j, w, h, (image.size[0], image.size[1]), is_for_txt=False, rep_img_bnw=False, rep_img=True, shades_or_img=img_grid)
+    
+    return update_img(image)
+
+def create_shades(image, size, num_shades):
     shades = []
     image = image.resize(size=size)
+    grayscale(image)
     
-    if bnw:
-        grayscale(image)
     jump = int(256 / num_shades)
     for bright in range(-127, 127, jump):
         new_img = image.copy()
@@ -326,7 +334,7 @@ def mosaic(image, w, h, method_id=0, sign='CARLOS'):
 
     return update_img(image)
 
-def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, rep_img=False, shades=None):
+def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, rep_img_bnw=False, rep_img=False, shades_or_img=None):
     w = origin_x + x
     h = origin_y + y
     if w > img_size[0]: w = img_size[0]
@@ -346,7 +354,7 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, r
         for idx in range(3):
             average[idx] = int(average[idx] / total)
         
-        if rep_img:
+        if rep_img_bnw:
             
             gray = int((average[0] + average[1] + average[2]) / 3)
             shade_idx = 0
@@ -354,7 +362,7 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, r
 
             for idx in range(0, 256, 8):
                 if idx <= gray <= (idx + 7):
-                    shade = shades[shade_idx].copy()
+                    shade = shades_or_img[shade_idx].copy()
                     break
                 shade_idx += 1
             
@@ -370,6 +378,26 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, r
                         pixel_sh = pixels_sh[ri_x, ri_y]
                         pixels[i, j] = (pixel_sh[0], pixel_sh[1], pixel_sh[2], 255)
                     
+        elif rep_img:
+            img_grid = shades_or_img.copy()
+            
+            RGB_components(img_grid, average[0], average[1], average[2])
+            if origin_y < 1 and origin_x < 1:
+                prueba = img_grid.resize((100,100))
+                prueba.show()
+                print(average)
+            pixels_grid = img_grid.load()
+            
+            ri_x = -1
+            for i in range(origin_x, w):
+                ri_x += 1
+                ri_y = -1
+                for j in range(origin_y, h):
+                    ri_y += 1
+                    if ri_y <= img_grid.size[1] - 1 and ri_x <= img_grid.size[0] - 1:
+                        pixel_grid = pixels_grid[ri_x, ri_y]
+                        pixels[i, j] = (pixel_grid[0], pixel_grid[1], pixel_grid[2], 255)
+
         else:
             for i in range(origin_x, w):
                 for j in range(origin_y, h):
@@ -402,7 +430,7 @@ def RGB_components(image, r, g, b):
     for i in range(image.size[0]):
         for j in range(image.size[1]):
             pixel = pixels[i, j]
-            pixels[i, j] = (r and pixel[0], g and pixel[1], b and pixel[0], 255)
+            pixels[i, j] = (r & pixel[0], g & pixel[1], b & pixel[0], 255)
     return update_img(image)
 
 def convolution(image, filter_matrix, filter_width, filter_height, factor, bias):
