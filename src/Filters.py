@@ -150,7 +150,7 @@ def watermark(image, watermark, position, alpha):
 
 def mosaic_img_bw(image, img_grid, w, h):
     num_shades = 32
-    shades = create_shades(img_grid, (w, h), num_shades, True)
+    shades = create_shades(img_grid, (w, h), num_shades)
     pixels = image.load()
 
     for j in range(0, image.size[1], h):
@@ -382,10 +382,6 @@ def average_grid(pixels, origin_x, origin_y, x, y, img_size, is_for_txt=False, r
             img_grid = shades_or_img.copy()
             
             RGB_components(img_grid, average[0], average[1], average[2])
-            if origin_y < 1 and origin_x < 1:
-                prueba = img_grid.resize((100,100))
-                prueba.show()
-                print(average)
             pixels_grid = img_grid.load()
             
             ri_x = -1
@@ -430,7 +426,7 @@ def RGB_components(image, r, g, b):
     for i in range(image.size[0]):
         for j in range(image.size[1]):
             pixel = pixels[i, j]
-            pixels[i, j] = (r & pixel[0], g & pixel[1], b & pixel[0], 255)
+            pixels[i, j] = (clamp(r & pixel[0], 0, 255), clamp(g & pixel[1], 0, 255), clamp(b & pixel[0], 0, 255), 255)
     return update_img(image)
 
 def convolution(image, filter_matrix, filter_width, filter_height, factor, bias):
