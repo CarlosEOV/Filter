@@ -510,7 +510,7 @@ def start_filter_GUI():
                     apply_filter(event, F_IMG, main_window, 2, int(w_value), int(h_value))
 
         if event == 'About...':
-            sg.popup('Filter App', 'Version 1.05', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/22/21',
+            sg.popup('Filter App', 'Version 1.06', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/29/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
 

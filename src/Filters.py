@@ -216,6 +216,8 @@ def average_semitone(pixels, origin_x, origin_y, x, y, img_size, shades):
         shade_idx = 0 
         for idx in range(0, 256, step):
             if idx <= gray <= (idx + step - 1):
+                if shade_idx >= len(shades):
+                    shade_idx = len(shades) - 1
                 shade = shades[shade_idx].copy()
                 break
             shade_idx += 1
