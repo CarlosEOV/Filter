@@ -159,6 +159,78 @@ def mosaic_img_bw(image, img_grid, w, h):
     
     return update_img(image)
 
+def semitone(image, set_idx, w, h):
+    shades = load_shades(set_idx, (w, h))
+    pixels = image.load()
+
+    for j in range(0, image.size[1], h):
+        for i in range(0, image.size[0], w):
+            average_semitone(pixels, i, j, w, h, (image.size[0], image.size[1]), shades)
+
+    return update_img(image)
+    
+def load_shades(set_idx, size):
+    shades = []
+    set_img = "img/"
+    length = 10
+    img_name = ""
+    if(set_idx == 0):
+        set_img += "a/"
+        img_name += "a"
+    elif(set_idx == 1):
+        set_img += "b/"
+        img_name += "b"
+    else:
+        set_img += "c/" 
+        img_name += "c"
+        length = 5
+    
+    for image in range(0, length):
+        shade = Image.open(set_img + img_name + str(image) + ".png")
+        shades.append(shade.resize(size))
+
+    return shades
+
+def average_semitone(pixels, origin_x, origin_y, x, y, img_size, shades):
+    w = origin_x + x
+    h = origin_y + y
+    if w > img_size[0]: w = img_size[0]
+    if h > img_size[1]: h = img_size[1]
+    average = [0, 0, 0]
+    total = 0
+    
+    for i in range(origin_x, w):
+        for j in range(origin_y, h):
+            total += 1
+            pixel = pixels[i, j]
+            average[0] += pixel[0] 
+            average[1] += pixel[1] 
+            average[2] += pixel[2]
+            
+    if total != 0:
+        for idx in range(3):
+            average[idx] = int(average[idx] / total)
+        
+        gray = int((average[0] + average[1] + average[2]) / 3)
+        step = int(256 / len(shades))
+        shade_idx = 0 
+        for idx in range(0, 256, step):
+            if idx <= gray <= (idx + step - 1):
+                shade = shades[shade_idx].copy()
+                break
+            shade_idx += 1
+
+        pixels_sh = shade.load()
+        ri_x = -1        
+        for i in range(origin_x, w):
+            ri_x += 1
+            ri_y = -1
+            for j in range(origin_y, h):
+                ri_y += 1
+                if ri_y < shade.size[1] and ri_x < shade.size[0]:
+                    pixel_sh: tuple = pixels_sh[ri_x, ri_y]
+                    pixels[i, j] = (pixel_sh[0], pixel_sh[1], pixel_sh[2], 255)
+
 def mosaic_true_colors(image, img_grid, w, h):
     pixels = image.load()
     img_grid = img_grid.resize(size=(w, h))

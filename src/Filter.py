@@ -33,7 +33,8 @@ def start_filter_GUI():
                              '&Convolution', ['&Blur', '&Motion blur', '&Find edges' , '&Sharpen', '&Emboss'],
                              '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
                              '&Grayscale characters', '---', '&Sign', '---', '&Black dominoes', '&White dominoes','---', '&Cards'],
-                             '&Blending' , '&Watermark',
+                             '&Blending' , '&Watermark', 
+                             '&Semitones', ['&Semitone a', '&Semitone b', '&Semitone c']
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -451,6 +452,63 @@ def start_filter_GUI():
                         F_IMG = OG_IMG.copy()
                         apply_filter(event, F_IMG, main_window, img_for_grid, int(w_value), int(h_value))
 
+            elif event == 'Semitone a':
+                b_event, b_values = sg.Window('Semitone a', [
+                    [sg.T('Adjust mosaic size')],
+                    [sg.T('Height')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-H_VALUE-', tooltip='Height')],
+                    [sg.T('Width')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-W_VALUE-', tooltip='Width')],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                w_value = b_values['-W_VALUE-']
+                h_value = b_values['-H_VALUE-']
+
+                if w_value != None and h_value != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, 0, int(w_value), int(h_value))
+            
+            elif event == 'Semitone b':
+                b_event, b_values = sg.Window('Semitone b', [
+                    [sg.T('Adjust mosaic size')],
+                    [sg.T('Height')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-H_VALUE-', tooltip='Height')],
+                    [sg.T('Width')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-W_VALUE-', tooltip='Width')],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                w_value = b_values['-W_VALUE-']
+                h_value = b_values['-H_VALUE-']
+
+                if w_value != None and h_value != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, 1, int(w_value), int(h_value))
+            
+            elif event == 'Semitone c':
+                b_event, b_values = sg.Window('Semitone c', [
+                    [sg.T('Adjust mosaic size')],
+                    [sg.T('Height')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-H_VALUE-', tooltip='Height')],
+                    [sg.T('Width')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-W_VALUE-', tooltip='Width')],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                w_value = b_values['-W_VALUE-']
+                h_value = b_values['-H_VALUE-']
+
+                if w_value != None and h_value != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, 2, int(w_value), int(h_value))
+
         if event == 'About...':
             sg.popup('Filter App', 'Version 1.05', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/22/21',
                      grab_anywhere=True, modal=True, 
@@ -568,5 +626,11 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         mosaic_img_bw(F_IMG, param_1, param_2, param_3)
     if filter_name == 'Image true colors':
         mosaic_true_colors(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Semitone a':
+        semitone(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Semitone b':
+        semitone(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Semitone c':
+        semitone(F_IMG, param_1, param_2, param_3)
 
 start_filter_GUI()
