@@ -34,7 +34,8 @@ def start_filter_GUI():
                              '&Text', ['&Color Ms', '&Grayscale Ms', '---', '&Color characters', '&Black and White characters', 
                              '&Grayscale characters', '---', '&Sign', '---', '&Black dominoes', '&White dominoes','---', '&Cards'],
                              '&Blending' , '&Watermark', 
-                             '&Semitones', ['&Semitone a', '&Semitone b', '&Semitone c']
+                             '&Semitones', ['&Semitone a', '&Semitone b', '&Semitone c'],
+                             '&Max Min', ['Max', 'Min']
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -508,6 +509,37 @@ def start_filter_GUI():
                 if w_value != None and h_value != None:
                     F_IMG = OG_IMG.copy()
                     apply_filter(event, F_IMG, main_window, 2, int(w_value), int(h_value))
+            
+            elif event == 'Max':
+                b_event, b_values = sg.Window('Max', [
+                    [sg.T('Select intensity matrix for Max filter')],
+                    [sg.Radio(text='3x3 Matrix', group_id=1, default=True, key='-3_M-'), 
+                     sg.Radio(text='5x5 Matrix', group_id=1, default=False, key='-5_M-')
+                    ],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                selection = 3 if b_values['-3_M-'] else 5
+                
+                if selection != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, (selection,selection), True)
+            
+            elif event == 'Min':
+                b_event, b_values = sg.Window('Min', [
+                    [sg.T('Select intensity matrix for Min filter')],
+                    [sg.Radio(text='3x3 Matrix', group_id=1, default=True, key='-3_M-'), 
+                     sg.Radio(text='5x5 Matrix', group_id=1, default=False, key='-5_M-')
+                    ],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+
+                selection = 3 if b_values['-3_M-'] else 5
+                
+                if selection != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, (selection,selection), False)
+
 
         if event == 'About...':
             sg.popup('Filter App', 'Version 1.06', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/29/21',
@@ -632,5 +664,9 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         semitone(F_IMG, param_1, param_2, param_3)
     if filter_name == 'Semitone c':
         semitone(F_IMG, param_1, param_2, param_3)
+    if filter_name == 'Max':
+        max_min(F_IMG, param_1, param_2)
+    if filter_name == 'Min':
+        max_min(F_IMG, param_1, param_2)
 
 start_filter_GUI()

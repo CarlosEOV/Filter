@@ -1,3 +1,4 @@
+from PIL.ImageGrab import grab
 from PySimpleGUI.PySimpleGUI import Sizer
 from Decoder_IMG import update_img
 from PIL import Image, ImageFont, ImageDraw
@@ -501,6 +502,36 @@ def RGB_components(image, r, g, b):
         for j in range(image.size[1]):
             pixel = pixels[i, j]
             pixels[i, j] = (clamp(r & pixel[0], 0, 255), clamp(g & pixel[1], 0, 255), clamp(b & pixel[0], 0, 255), 255)
+    return update_img(image)
+
+def max_min(image, size, max=False):
+    grayscale(image)
+    img_copy = image.copy()
+    pixels = img_copy.load()
+    og_pixels = image.load()
+    w = image.size[0]
+    h = image.size[1]
+    for i in range(w):
+        for j in range(h):
+            imageX = 0
+            imageY = 0
+            max_min_list = []
+            for m in range(size[1]):
+                for n in range(size[0]):
+                    imageX = (i - size[0] / 2 + n + w) % w
+                    imageY = (j - size[1] / 2 + m + h) % h
+                    pixel = pixels[imageX , imageY]
+                    if pixel[0] not in max_min_list:
+                        max_min_list.append(pixel[0])
+            
+            max_min_list.sort()
+            gray = max_min_list[0]
+            
+            if max :
+                gray = max_min_list[len(max_min_list) - 1]
+            
+            og_pixels[i, j] = (gray, gray, gray, 255)
+    
     return update_img(image)
 
 def convolution(image, filter_matrix, filter_width, filter_height, factor, bias):
