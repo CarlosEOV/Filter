@@ -2,6 +2,7 @@ from PIL.ImageGrab import grab
 from PySimpleGUI.PySimpleGUI import Sizer
 from Decoder_IMG import update_img
 from PIL import Image, ImageFont, ImageDraw
+import random
 
 def average_grayscale(image):
     pixels = image.load()
@@ -659,3 +660,52 @@ def emboss(image):
     bias = 128.0
 
     return convolution(image, emboss_matrix, emboss_w, emboss_h, factor, bias)
+
+def random_dithering(image):
+    pixels = image.load()
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            pixel = pixels[i, j]
+            gray = int((pixel[0] * 0.3) + (pixel[1] * 0.59) + (pixel[2] * 0.11))
+            rdm = random.randint(0, 255)
+            value = 0 if rdm > gray else 255
+            pixels[i, j] = (value, value, value, 255)
+
+    return update_img(image)
+
+def dithering(image, matrix, w, h):
+    pixels = image.load()
+    for j in range(0, image.size[1], h):
+        for i in range(0, image.size[0], w):
+            dithering_matrix(pixels, i, j, w, h, (image.size[0], image.size[1]), matrix)
+    
+    return update_img(image)
+
+def dithering_matrix(pixels, origin_x, origin_y, x, y, img_size, matrix):
+    w = origin_x + x
+    h = origin_y + y
+    if w > img_size[0]: w = img_size[0]
+    if h > img_size[1]: h = img_size[1]
+    total = 0
+    
+    for j in range(origin_y, h):
+        for i in range(origin_x, w):
+            
+            pixel = pixels[i, j]
+            gray = int((pixel[0] * 0.3) + (pixel[1] * 0.59) + (pixel[2] * 0.11))
+            value = int(gray / 28)
+            color = 0 if value <  matrix[total] else 255
+            pixels[i, j] = (color, color, color, 255)
+            total += 1
+
+def clustered_dithering(image):
+    matrix = [8, 3, 4, 
+              6, 1, 2, 
+              7, 5, 9]
+    return dithering(image, matrix, 3, 3)
+
+def scattered_dithering(image):
+    matrix = [1, 7, 4, 
+              5, 8, 3, 
+              6, 2, 9]
+    return dithering(image, matrix, 3, 3)

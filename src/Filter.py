@@ -35,7 +35,8 @@ def start_filter_GUI():
                              '&Grayscale characters', '---', '&Sign', '---', '&Black dominoes', '&White dominoes','---', '&Cards'],
                              '&Blending' , '&Watermark', 
                              '&Semitones', ['&Semitone a', '&Semitone b', '&Semitone c'],
-                             '&Max Min', ['Max', 'Min']
+                             '&Max Min', ['Max', 'Min'],
+                             'Dithering', ['Random', 'Clustered', 'Scattered']
                              ]],
                 
                 ['&Help', '&About...'], ]
@@ -539,10 +540,20 @@ def start_filter_GUI():
                 if selection != None:
                     F_IMG = OG_IMG.copy()
                     apply_filter(event, F_IMG, main_window, (selection,selection), False)
-
+            
+            elif event == 'Random':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            
+            elif event == 'Clustered':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
+            elif event == 'Scattered':
+                F_IMG = OG_IMG.copy()
+                apply_filter(event, F_IMG, main_window)
 
         if event == 'About...':
-            sg.popup('Filter App', 'Version 1.06', 'Carlos Eduardo Orozco Viveros', 'Release date: 06/29/21',
+            sg.popup('Filter App', 'Version 1.08', 'Carlos Eduardo Orozco Viveros', 'Release date: 08/03/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
 
@@ -668,5 +679,11 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         max_min(F_IMG, param_1, param_2)
     if filter_name == 'Min':
         max_min(F_IMG, param_1, param_2)
+    if filter_name == 'Random':
+        random_dithering(F_IMG)
+    if filter_name == 'Clustered':
+        clustered_dithering(F_IMG)
+    if filter_name == 'Scattered':
+        scattered_dithering(F_IMG)
 
 start_filter_GUI()
