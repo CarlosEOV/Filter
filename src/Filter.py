@@ -2,7 +2,8 @@
 import PySimpleGUI as sg
 import io
 import os
-from PIL import ImageGrab
+import glob
+from PIL import Image, ImageGrab
 from Decoder_IMG import *
 from Filters import *
 
@@ -36,9 +37,10 @@ def start_filter_GUI():
                              '&Blending' , '&Watermark', 
                              '&Semitones', ['&Semitone a', '&Semitone b', '&Semitone c'],
                              '&Max Min', ['Max', 'Min'],
-                             'Dithering', ['Random', 'Clustered', 'Scattered']
+                             'Dithering', ['Random', 'Clustered', 'Scattered'],
+                             'Fotomorsaics', ['Fotomorsaic']
                              ]],
-                
+                ['&Tools', ['Create Library',]],
                 ['&Help', '&About...'], ]
     
     column1_layout = [
@@ -551,9 +553,37 @@ def start_filter_GUI():
             elif event == 'Scattered':
                 F_IMG = OG_IMG.copy()
                 apply_filter(event, F_IMG, main_window)
+            elif event == 'Fotomorsaic':
+                filename = sg.popup_get_file('Library idx', no_window=True, keep_on_top=True, modal=True, file_types=(("IDX", "*.idx"),))
+                foldername = sg.popup_get_folder('Images library', no_window=True, keep_on_top=True, modal=True)
+                b_event, b_values = sg.Window('Mosaic', [
+                    [sg.T('Adjust mosaic size')],
+                    [sg.T('Height')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-H_VALUE-', tooltip='Height')],
+                    [sg.T('Width')],
+                    [sg.Slider(range=(10, 100), default_value=10, resolution=1, tick_interval=20, 
+                                orientation='h', border_width=3, size=(40, 10), key='-W_VALUE-', tooltip='Width')],
+                    [sg.T('Image selection')],
+                    [sg.Radio(text='Best fit', group_id=1, default=True, key='-BF-'), 
+                     sg.Radio(text='Randomize', group_id=1, default=False, key='-RM-')
+                    ],
+                    [sg.Button('Ok')]
+                ], modal=True, keep_on_top=True).read(close=True)
+                w_value = b_values['-W_VALUE-']
+                h_value = b_values['-H_VALUE-']
+                selection = b_values['-BF-']
+                if w_value != None and h_value != None and filename != None and foldername != None and selection != None:
+                    F_IMG = OG_IMG.copy()
+                    apply_filter(event, F_IMG, main_window, (foldername, filename), (int(w_value), int(h_value)), selection)
+
+        if event == 'Create Library':
+            foldername = sg.popup_get_folder('Images folder', no_window=True, keep_on_top=True, modal=True)
+            if foldername != None and foldername != '':    
+                create_library(foldername)
 
         if event == 'About...':
-            sg.popup('Filter App', 'Version 1.08', 'Carlos Eduardo Orozco Viveros', 'Release date: 08/03/21',
+            sg.popup('Filter App', 'Version 2.00', 'Carlos Eduardo Orozco Viveros', 'Release date: 08/11/21',
                      grab_anywhere=True, modal=True, 
                      background_color=MAIN_COLOR, text_color=TXT_COLOR, no_titlebar=True)
 
@@ -600,8 +630,36 @@ def apply_filter(filter_name, F_IMG, main_window, param_1=0, param_2=0, param_3=
     progress_bar.update_bar(8)
     main_window['-F_IMAGE-'].update(data=get_bytes(T_IMG), size=IMG_SIZE)
     progress_bar.update_bar(9)
-    pb_window.close()   
+    pb_window.close()
 
+def create_library(path):
+    files = os.listdir(path)
+    number_files = len(files) + 10
+    progress_value = 0
+    
+    pb_layout = [[sg.Text('Loading...', key='-ACTUAL-')],
+                         [sg.ProgressBar(max_value=number_files, orientation='h', size=(100, 15), key='-PGRB-')]
+                        ]
+    pb_window = sg.Window(title='Loading images', layout=pb_layout, finalize=True, disable_close=True, modal=True)
+    progress_bar = pb_window['-PGRB-']
+    progress_value += 1
+    progress_bar.update_bar(progress_value)
+    
+    file = open('library/lib.idx', 'w')
+    images = glob.glob(path + "/*.jpg")
+    progress_value += 1
+    progress_bar.update_bar(progress_value)
+    for image in images:
+        img = Image.open(image)
+        color = average_color(img)
+        line = str(color[0]) +' '+ str(color[1]) +' '+ str(color[2]) +' '+ os.path.basename(image) + os.linesep
+        progress_value += 1
+        progress_bar.update_bar(progress_value)
+        file.write(line)
+    
+    file.close()
+    pb_window.close()
+    
 def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
     if filter_name == 'Average Grayscale':
         average_grayscale(F_IMG)
@@ -685,5 +743,10 @@ def choose_filter(filter_name, F_IMG, param_1, param_2, param_3):
         clustered_dithering(F_IMG)
     if filter_name == 'Scattered':
         scattered_dithering(F_IMG)
+    if filter_name == 'Create Library':
+        create_library(param_1)
+    if filter_name == 'Fotomorsaic':
+        fotomorsaic(F_IMG, param_1, param_2, param_3)
 
-start_filter_GUI()
+if __name__ == '__main__':
+    start_filter_GUI()

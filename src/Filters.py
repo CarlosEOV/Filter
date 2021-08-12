@@ -2,6 +2,7 @@ from PIL.ImageGrab import grab
 from PySimpleGUI.PySimpleGUI import Sizer
 from Decoder_IMG import update_img
 from PIL import Image, ImageFont, ImageDraw
+import math
 import random
 
 def average_grayscale(image):
@@ -709,3 +710,119 @@ def scattered_dithering(image):
               5, 8, 3, 
               6, 2, 9]
     return dithering(image, matrix, 3, 3)
+
+def average_color(image):
+    pixels = image.load()
+    total = image.size[0] * image.size[1]
+    color = (0,0,0)
+    for i in range(image.size[0]):
+        for j in range(image.size[1]):
+            pixel = pixels[i, j]
+            color = (color[0] + pixel[0], color[1] + pixel[1], color[2] + pixel[2])
+    average = (int(color[0] / total) , int(color[1] / total) , int(color[2] / total) )
+    return average
+
+def load_library_idx(path):
+    library_idx = open(path, 'r')
+    lines = library_idx.readlines()
+    library = []
+    for line in lines:
+        data = line.split()
+        if len(data) < 4:
+            continue
+        library.append(data)
+    library_idx.close()
+    return library
+
+def fotomorsaic(image, library_idx, size, bestFit=True):
+    library = load_library_idx(library_idx[1])
+    w = size[0]
+    h = size[1]
+    pixels = image.load()
+    for j in range(0, image.size[1], h):
+        for i in range(0, image.size[0], w):
+            average_morsaic(pixels, i, j, w, h, (image.size[0], image.size[1]), library, library_idx[0], bestFit)
+    
+    return update_img(image)
+
+def average_morsaic(pixels, origin_x, origin_y, x, y, img_size, library, foldername, bestFit):
+    w = origin_x + x
+    h = origin_y + y
+    if w > img_size[0]: w = img_size[0]
+    if h > img_size[1]: h = img_size[1]
+    average = [0, 0, 0]
+    total = 0
+    
+    for i in range(origin_x, w):
+        for j in range(origin_y, h):
+            total += 1
+            pixel = pixels[i, j]
+            average[0] += pixel[0] 
+            average[1] += pixel[1] 
+            average[2] += pixel[2]
+            
+    if total != 0:
+        for idx in range(3):
+            average[idx] = int(average[idx] / total)
+
+
+        
+
+        if not bestFit:
+            distance = []
+            
+            for img in library:
+                average2 = img.copy()
+                average2 = average2[:3]
+                for chanel in range(3):
+                    average2[chanel] = int(average2[chanel])
+                
+                distance.append((riemersma_distance(average, average2), img[3]))
+            
+            distance.sort(key=sort_by_distance)
+
+            distance = distance[:10]
+            
+            selected = Image.open(foldername +'/'+ random.choice(distance)[1])
+        else:
+            best = None
+            for img in library:
+                average2 = img.copy()
+                average2 = average2[:3]
+                for chanel in range(3):
+                    average2[chanel] = int(average2[chanel])
+                
+                distance = riemersma_distance(average, average2)
+                
+                if best == None or best[0] > distance:
+                    best = (distance, img[3])
+
+            selected = Image.open(foldername +'/'+best[1])
+        
+        img_grid = selected.resize(size=(x,y))
+        
+        pixels_grid = img_grid.load()
+        ri_x = -1
+        for i in range(origin_x, w):
+            ri_x += 1
+            ri_y = -1
+            for j in range(origin_y, h):
+                ri_y += 1
+                if ri_y <= img_grid.size[1] - 1 and ri_x <= img_grid.size[0] - 1:
+                    pixel_grid = pixels_grid[ri_x, ri_y]
+                    pixels[i, j] = (pixel_grid[0], pixel_grid[1], pixel_grid[2], 255)
+
+def sort_by_distance(e):
+    return e[0]
+
+def riemersma_distance(average1, average2):
+    r = (average1[0] + average2[0]) / 2
+    deltaR = average1[0] - average2[0] 
+    deltaG = average1[1] - average2[1] 
+    deltaB = average1[2] - average2[2]
+
+    chanelR = (2 + (r / 256)) * (deltaR * deltaR)
+    chanelG = 4 * (deltaG * deltaG)
+    chanelB = (2 + ((255 - r) / 256)) * (deltaB * deltaB)
+
+    return math.sqrt(chanelR + chanelG + chanelB)
